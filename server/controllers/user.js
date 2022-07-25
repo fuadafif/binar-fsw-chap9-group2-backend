@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // import models
-const { user_game } = require("../models");
+const { user_game, user_game_biodata } = require("../models");
 
 // baca kunci JWT dari env, jika tidak ada gunakan nilai default
 const jwtKey = process.env.JWT_KEY || "secret";
@@ -41,7 +41,6 @@ const login = async (req, res) => {
   const tokenPayload = {
     id: userData.id,
     email: userData.email,
-    roles: userData.roles,
   };
 
   // buat token
@@ -53,7 +52,6 @@ const login = async (req, res) => {
     data: {
       id: userData.id,
       email: userData.email,
-      roles: userData.roles,
       token: token,
     },
   });
@@ -100,31 +98,27 @@ const register = async (req, res) => {
 
 const showPlayers = (req, res) => {
   let userData = [];
-  user_game.findAll({
-    order: [
-      ["id", "ASC"]
-    ]
-  })
-  .then(users => {
-    res.status(200).json({
-      message: "Berhasil ditampilkan",
-      data: {
-        users: users
-      }
+  user_game
+    .findAll({
+      order: [["id", "ASC"]],
+    })
+    .then((users) => {
+      res.status(200).json({
+        message: "Berhasil ditampilkan",
+        data: {
+          users: users,
+        },
+      });
+    })
+    .catch((err) => {
+      res.status(404).json({
+        message: "Gagal memuat data",
+      });
     });
-  })
-  .catch(err => {
-    res.status(404).json({
-      message: "Gagal memuat data"
-    });
-
-  }) 
-}
-
-
+};
 
 module.exports = {
   login,
   register,
-  showPlayers
+  showPlayers,
 };
